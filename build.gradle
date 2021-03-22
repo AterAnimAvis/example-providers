@@ -1,0 +1,68 @@
+plugins {
+   id 'java-gradle-plugin'
+   id 'maven-publish'
+}
+
+group 'io.github.ateranimavis.gradle'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://files.minecraftforge.net/maven/"
+        content {
+            includeGroup("net.minecraftforge")
+            includeGroup("net.minecraftforge.gradle")
+        }
+    }
+    mavenLocal() {
+        content {
+            includeGroup("net.minecraftforge.gradle")
+        }
+    }
+}
+
+gradlePlugin {
+    plugins {
+        exampleProvider {
+            id = 'io.github.ateranimavis.forge-gradle.example-providers'
+            implementationClass = 'io.github.ateranimavis.forge_gradle.ExampleProvidersPlugin'
+        }
+    }
+}
+
+dependencies {
+    implementation 'net.minecraftforge.gradle:ForgeGradle:4.1.+'
+    implementation 'net.minecraftforge:srgutils:0.4.1'
+    implementation 'de.siegmar:fastcsv:2.0.0'
+
+    implementation group: 'com.github.javaparser', name: 'javaparser-symbol-solver-core', version: '3.19.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.1'
+    implementation group: 'org.honton.chas.hocon', name: 'jackson-dataformat-hocon', version: '1.1.1'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+artifacts {
+    archives jar
+}
+
+publishing {
+    repositories {
+        maven {
+            name 'local_repo'
+            url 'file://' + rootProject.file('repo').getAbsolutePath()
+        }
+    }
+}
