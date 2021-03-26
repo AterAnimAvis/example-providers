@@ -8,10 +8,11 @@ import java.util.Collections;
 
 import org.apache.tools.ant.util.ReaderInputStream;
 import org.gradle.api.Project;
+import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
 import net.minecraftforge.gradle.common.util.HashStore;
-import net.minecraftforge.gradle.mcp.mapping.IMappingInfo;
-import net.minecraftforge.gradle.mcp.mapping.detail.MappingDetail;
-import net.minecraftforge.gradle.mcp.mapping.provider.CachingProvider;
+import net.minecraftforge.gradle.common.mapping.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
+import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.srgutils.IMappingFile;
 
 public class ExampleSrgFileProvider extends CachingProvider {
@@ -39,7 +40,7 @@ public class ExampleSrgFileProvider extends CachingProvider {
             .add("codever", "1");
 
         return fromCachable(channel, version, cache, destination, () ->
-            MappingDetail.fromSrg(IMappingFile.load(new ReaderInputStream(new StringReader(mappings))))
+            MappingDetails.fromSrg(IMappingFile.load(new ReaderInputStream(new StringReader(mappings))))
         );
     }
 

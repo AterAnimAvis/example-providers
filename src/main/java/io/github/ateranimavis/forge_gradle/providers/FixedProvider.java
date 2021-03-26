@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gradle.api.Project;
-import net.minecraftforge.gradle.mcp.mapping.IMappingInfo;
-import net.minecraftforge.gradle.mcp.mapping.IMappingProvider;
-import net.minecraftforge.gradle.mcp.mapping.MappingProviders;
-import net.minecraftforge.gradle.mcp.mapping.info.MappingInfo;
+import net.minecraftforge.gradle.common.mapping.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.IMappingProvider;
+import net.minecraftforge.gradle.common.mapping.MappingProviders;
+import net.minecraftforge.gradle.common.mapping.info.MappingInfo;
 
 public class FixedProvider implements IMappingProvider {
 

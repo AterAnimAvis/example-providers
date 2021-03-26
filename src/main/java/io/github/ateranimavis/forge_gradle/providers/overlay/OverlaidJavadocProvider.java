@@ -11,14 +11,14 @@ import org.gradle.api.Project;
 import de.siegmar.fastcsv.reader.NamedCsvReader;
 import de.siegmar.fastcsv.reader.NamedCsvRow;
 import net.minecraftforge.gradle.common.util.HashStore;
-import net.minecraftforge.gradle.mcp.mapping.IMappingDetail;
-import net.minecraftforge.gradle.mcp.mapping.IMappingInfo;
-import net.minecraftforge.gradle.mcp.mapping.IMappingProvider;
-import net.minecraftforge.gradle.mcp.mapping.MappingProviders;
-import net.minecraftforge.gradle.mcp.mapping.detail.MappingDetail;
-import net.minecraftforge.gradle.mcp.mapping.detail.Node;
-import net.minecraftforge.gradle.mcp.mapping.provider.CachingProvider;
-import net.minecraftforge.gradle.mcp.mapping.provider.OfficialMappingProvider;
+import net.minecraftforge.gradle.common.mapping.IMappingDetail;
+import net.minecraftforge.gradle.common.mapping.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.IMappingProvider;
+import net.minecraftforge.gradle.common.mapping.MappingProviders;
+import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
+import net.minecraftforge.gradle.common.mapping.detail.Node;
+import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
+import net.minecraftforge.gradle.common.mapping.provider.OfficialMappingProvider;
 
 /**
  * An example {@link IMappingProvider} that produces mappings based on {@link OfficialMappingProvider} with overlaid information.
