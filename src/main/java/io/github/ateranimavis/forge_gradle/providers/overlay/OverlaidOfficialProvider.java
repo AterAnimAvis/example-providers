@@ -50,7 +50,7 @@ public class OverlaidOfficialProvider implements IMappingProvider {
         String channelVersion = parts[0];
         String version = parts[1];
 
-        IMappingInfo official = MappingProviders.getInfo(project, "official", channelVersion);
+        IMappingInfo official = MappingProviders.getInfo(project, OfficialMappingProvider.OFFICIAL_CHANNEL, channelVersion);
 
         String classes = "" +
             "searge,name,side,desc\n" +

@@ -32,7 +32,7 @@ public class MCPOverlaidProvider implements IMappingProvider {
         String mcp_channel = parts[1];
         String mcp_version = parts[2];
 
-        IMappingInfo official = MappingProviders.getInfo(project, "official", official_version);
+        IMappingInfo official = MappingProviders.getInfo(project, OfficialMappingProvider.OFFICIAL_CHANNEL, official_version);
         IMappingInfo mcp = MappingProviders.getInfo(project, mcp_channel, mcp_version);
 
         File mappings = cacheMappings(project, channel, version, "zip");
