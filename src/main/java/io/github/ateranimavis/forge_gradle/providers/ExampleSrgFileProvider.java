@@ -8,13 +8,15 @@ import java.util.Collections;
 
 import org.apache.tools.ant.util.ReaderInputStream;
 import org.gradle.api.Project;
+import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.mapping.IMappingInfo;
-import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.srgutils.IMappingFile;
 
-public class ExampleSrgFileProvider extends CachingProvider {
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+
+public class ExampleSrgFileProvider implements IMappingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {

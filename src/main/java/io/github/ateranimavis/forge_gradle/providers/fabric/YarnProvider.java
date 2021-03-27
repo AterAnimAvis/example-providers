@@ -11,18 +11,20 @@ import org.gradle.api.Project;
 import io.github.ateranimavis.forge_gradle.providers.utils.ZipHelper;
 import net.minecraftforge.gradle.common.mapping.IMappingDetail;
 import net.minecraftforge.gradle.common.mapping.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.MappingProviders;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
 import net.minecraftforge.gradle.common.mapping.detail.Node;
-import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.util.MavenArtifactDownloader;
+
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
 
 /**
  * Note: this causes compile exceptions in the mapped jar
  */
-public class YarnProvider extends CachingProvider {
+public class YarnProvider implements IMappingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {

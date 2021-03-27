@@ -17,13 +17,14 @@ import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.MappingProviders;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
 import net.minecraftforge.gradle.common.mapping.detail.Node;
-import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.gradle.common.mapping.provider.OfficialMappingProvider;
+
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
 
 /**
  * An example {@link IMappingProvider} that produces mappings based on {@link OfficialMappingProvider} with overlaid information.
  */
-public class OverlaidOfficialProvider extends CachingProvider {
+public class OverlaidOfficialProvider implements IMappingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {

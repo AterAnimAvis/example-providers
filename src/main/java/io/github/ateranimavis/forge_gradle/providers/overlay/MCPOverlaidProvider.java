@@ -8,16 +8,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gradle.api.Project;
+import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.mapping.IMappingDetail;
 import net.minecraftforge.gradle.common.mapping.IMappingInfo;
 import net.minecraftforge.gradle.common.mapping.MappingProviders;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
 import net.minecraftforge.gradle.common.mapping.detail.Node;
-import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.gradle.common.mapping.provider.OfficialMappingProvider;
 
-public class MCPOverlaidProvider extends CachingProvider {
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+
+public class MCPOverlaidProvider implements IMappingProvider {
     @Override
     public Collection<String> getMappingChannels() {
         return Collections.singleton("example_official_mcp");
@@ -81,13 +83,13 @@ public class MCPOverlaidProvider extends CachingProvider {
         if (parts.length == 1) parts = version.split("-", 3);
 
         if (parts.length == 2) {
-            if (!parts[1].contains("-")) parts[1] = parts[1] + "-" + OfficialMappingProvider.getMCVersion(parts[0]);
+            if (!parts[1].contains("-")) parts[1] = parts[1] + "-" + OfficialMappingProvider.getMinecraftVersion(parts[0]);
 
             return new String[] { parts[0], "snapshot", parts[1] };
         }
 
         if (parts.length == 3) {
-            if (!parts[2].contains("-")) parts[2] = parts[2] + "-" + OfficialMappingProvider.getMCVersion(parts[0]);
+            if (!parts[2].contains("-")) parts[2] = parts[2] + "-" + OfficialMappingProvider.getMinecraftVersion(parts[0]);
 
             return parts;
         }

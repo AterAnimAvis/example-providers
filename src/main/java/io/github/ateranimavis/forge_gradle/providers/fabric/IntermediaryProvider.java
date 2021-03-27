@@ -8,16 +8,18 @@ import java.util.Collections;
 import org.gradle.api.Project;
 import io.github.ateranimavis.forge_gradle.providers.utils.ZipHelper;
 import net.minecraftforge.gradle.common.mapping.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
-import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.util.MavenArtifactDownloader;
 import net.minecraftforge.srgutils.IMappingFile;
 
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+
 /**
  * I haven't checked to ensure validity of the resulting jars
  */
-public class IntermediaryProvider extends CachingProvider {
+public class IntermediaryProvider implements IMappingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
@@ -34,8 +36,8 @@ public class IntermediaryProvider extends CachingProvider {
             throw new IllegalStateException("Could not create " + version + " intermediary mappings due to missing MCP's tsrg");
 
         File mcp = getMCPConfigZip(project, version);
-        if (mcp == null)
-            return null;
+        if (mcp == null) // TODO: handle when MCPConfig zip could not be downloaded
+            throw new IllegalStateException("Could not create " + version + " official mappings due to missing MCPConfig zip");
 
         File mappings = cacheMappings(project, channel, version, "zip");
         HashStore cache = commonHash(project, mcp)
