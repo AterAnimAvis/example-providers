@@ -27,7 +27,7 @@ public class OverlaidJavadocProvider extends CachingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("ex_javadoc");
+        return Collections.singleton("example_javadoc");
     }
 
     /**
@@ -46,8 +46,6 @@ public class OverlaidJavadocProvider extends CachingProvider {
      */
     @Override
     public IMappingInfo getMappingInfo(Project project, String channel, String version) throws IOException {
-        project.getLogger().lifecycle("Resolving: " + this);
-
         String[] parts = getVersion(version);
 
         String javadocVersion = parts[0];

@@ -27,7 +27,7 @@ public class OverlaidOfficialProvider extends CachingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("ex_official");
+        return Collections.singleton("example_official");
     }
 
     /**
@@ -44,8 +44,6 @@ public class OverlaidOfficialProvider extends CachingProvider {
      */
     @Override
     public IMappingInfo getMappingInfo(Project project, String channel, String versionIn) throws IOException {
-        project.getLogger().lifecycle("Resolving: " + this);
-
         String[] parts = splitVersions(versionIn);
 
         String channelVersion = parts[0];

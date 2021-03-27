@@ -1,4 +1,4 @@
-package io.github.ateranimavis.forge_gradle.providers;
+package io.github.ateranimavis.forge_gradle.providers.fabric;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,22 +21,21 @@ public class YarnAltProvider extends CachingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("intermediary");
+        return Collections.singleton("example_yarn_alt");
     }
 
     @Override
     public IMappingInfo getMappingInfo(Project project, String channel, String version) throws IOException {
-        String desc = "net.fabricmc:yarn:" + version + ":v2";
-        File yarnZip = MavenArtifactDownloader.manual(project, desc, false);
+        String mcVersion = extractMCVersion(version);
 
-        String idesc = "net.fabricmc:intermediary:" + extractMCVersion(version) + ":v2";
-        File intermediaryZip = MavenArtifactDownloader.manual(project, idesc, false);
+        File yarnZip = MavenArtifactDownloader.manual(project, "net.fabricmc:yarn:" + version + ":v2", false);
+        File intermediaryZip = MavenArtifactDownloader.manual(project, "net.fabricmc:intermediary:" + mcVersion + ":v2", false);
 
-        File tsrgFile = findRenames(project, "obf_to_srg", IMappingFile.Format.TSRG, extractMCVersion(version), false);
+        File tsrgFile = findRenames(project, "obf_to_srg", IMappingFile.Format.TSRG, mcVersion, false);
         if (tsrgFile == null)
-            throw new IllegalStateException("Could not create " + version + " intermediary mappings due to missing MCP's tsrg");
+            throw new IllegalStateException("Could not create " + version + " yarn mappings due to missing MCP's tsrg");
 
-        File mcp = getMCPConfigZip(project, extractMCVersion(version));
+        File mcp = getMCPConfigZip(project, mcVersion);
         if (mcp == null)
             return null;
 
@@ -50,20 +49,19 @@ public class YarnAltProvider extends CachingProvider {
             .add("codever", "1");
 
         return fromCachable(channel, version, cache, mappings, () -> {
-            project.getLogger().warn("Rebuilding");
-
-            // Intermediary:
-            //  [INT->OBF]
+            // Intermediary: [INT->OBF]
             IMappingFile intermediary = ZipHelper.tinyFromZip(intermediaryZip, "intermediary", "official");
 
-            // Yarn:
-            //  [INT->MAP]
+            // Yarn: [INT->MAP]
             IMappingFile yarn = ZipHelper.tinyFromZip(yarnZip, "intermediary", "named");
 
-            // SRG:
-            //   [OBF->SRG]
+            // SRG: [OBF->SRG]
             IMappingFile obf_to_srg = IMappingFile.load(tsrgFile);
 
+            // Mapped: [SRG->MAP]
+            //   [INT->OBF] --chain--> [OBF->SRG] => [INT->SRG]
+            //   [INT->SRG] -reverse->            => [SRG->INT]
+            //   [SRG->INT] --chain--> [INT->MAP] => [SRG->MAP]
             return MappingDetails.fromSrg(intermediary.chain(obf_to_srg).reverse().chain(yarn));
         });
     }

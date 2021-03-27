@@ -11,7 +11,6 @@ import org.gradle.api.Project;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.mapping.IMappingInfo;
-import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
 import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.srgutils.IMappingFile;
 
@@ -19,13 +18,11 @@ public class ExampleSrgFileProvider extends CachingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("ex_srg");
+        return Collections.singleton("example_srg");
     }
 
     @Override
     public IMappingInfo getMappingInfo(Project project, String channel, String version) throws IOException {
-        project.getLogger().lifecycle("Resolving: " + this);
-
         // Anything not in the mappings will end up as SRG named
         String mappings = "" +
             "tsrg2 left right\n" +

@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.gradle.api.Project;
 import net.minecraftforge.gradle.common.util.HashStore;
@@ -22,19 +20,15 @@ import net.minecraftforge.gradle.common.mapping.provider.OfficialMappingProvider
 public class MCPOverlaidProvider extends CachingProvider {
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("official_mcp");
+        return Collections.singleton("example_official_mcp");
     }
 
     @Override
     public IMappingInfo getMappingInfo(Project project, String channel, String version) throws IOException {
-        project.getLogger().lifecycle("Resolving: " + this);
-
         String[] parts = splitVersion(version);
         String official_version = parts[0];
         String mcp_channel = parts[1];
         String mcp_version = parts[2];
-
-        project.getLogger().lifecycle("Resolving: " + official_version + " " + mcp_channel + " " + mcp_version);
 
         IMappingInfo official = MappingProviders.getInfo(project, "official", official_version);
         IMappingInfo mcp = MappingProviders.getInfo(project, mcp_channel, mcp_version);
@@ -51,18 +45,18 @@ public class MCPOverlaidProvider extends CachingProvider {
             IMappingDetail detail = official.getDetails();
             IMappingDetail overlay = mcp.getDetails();
 
-            Map<String, IMappingDetail.INode> classNodes = apply(overlay.getClasses(), detail.getClasses(), false);
-            Map<String, IMappingDetail.INode> fieldNodes = apply(overlay.getFields(), detail.getFields(), false);
-            Map<String, IMappingDetail.INode> methodNodes = apply(overlay.getMethods(), detail.getMethods(), false);
-            Map<String, IMappingDetail.INode> paramNodes = apply(overlay.getParameters(), detail.getParameters(), true);
+            Map<String, IMappingDetail.INode> classNodes = merge(overlay.getClasses(), detail.getClasses(), false);
+            Map<String, IMappingDetail.INode> fieldNodes = merge(overlay.getFields(), detail.getFields(), false);
+            Map<String, IMappingDetail.INode> methodNodes = merge(overlay.getMethods(), detail.getMethods(), false);
+            Map<String, IMappingDetail.INode> paramNodes = merge(overlay.getParameters(), detail.getParameters(), true);
 
             return MappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
         });
     }
 
-    private static Map<String, IMappingDetail.INode> apply(Map<String, IMappingDetail.INode> overlay, Map<String, IMappingDetail.INode> official, boolean fully) {
-        Map<String, IMappingDetail.INode> nodes = new HashMap<>(official);
-        Map<String, IMappingDetail.INode> data = fully ? overlay : nodes;
+    private static Map<String, IMappingDetail.INode> merge(Map<String, IMappingDetail.INode> overlay, Map<String, IMappingDetail.INode> original, boolean fully) {
+        Map<String, IMappingDetail.INode> nodes = new HashMap<>(original);
+        Map<String, IMappingDetail.INode> data = fully ? overlay : original;
 
         data.forEach((srg, orig) -> {
             if (!overlay.containsKey(srg)) return;
@@ -84,9 +78,7 @@ public class MCPOverlaidProvider extends CachingProvider {
     public static String[] splitVersion(String version) {
         String[] parts = version.split("~", 3);
 
-        if (parts.length == 1) {
-            parts = version.split("-", 3);
-        }
+        if (parts.length == 1) parts = version.split("-", 3);
 
         if (parts.length == 2) {
             if (!parts[1].contains("-")) parts[1] = parts[1] + "-" + OfficialMappingProvider.getMCVersion(parts[0]);

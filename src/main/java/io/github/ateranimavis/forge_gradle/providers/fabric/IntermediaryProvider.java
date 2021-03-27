@@ -1,4 +1,4 @@
-package io.github.ateranimavis.forge_gradle.providers;
+package io.github.ateranimavis.forge_gradle.providers.fabric;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,6 @@ import java.util.Collections;
 import org.gradle.api.Project;
 import io.github.ateranimavis.forge_gradle.providers.utils.ZipHelper;
 import net.minecraftforge.gradle.common.mapping.IMappingInfo;
-import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
 import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
@@ -16,13 +15,13 @@ import net.minecraftforge.gradle.common.util.MavenArtifactDownloader;
 import net.minecraftforge.srgutils.IMappingFile;
 
 /**
- * This doesn't have compile exceptions however I haven't checked to ensure validity of the resulting jars
+ * I haven't checked to ensure validity of the resulting jars
  */
 public class IntermediaryProvider extends CachingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("intermediary");
+        return Collections.singleton("example_intermediary");
     }
 
     @Override
@@ -47,15 +46,15 @@ public class IntermediaryProvider extends CachingProvider {
             .add("codever", "1");
 
         return fromCachable(channel, version, cache, mappings, () -> {
-            // Intermediary:
-            //   [INT->OBF]
+            // Intermediary: [INT->OBF]
             IMappingFile intermediary = ZipHelper.tinyFromZip(intermediaryZip, "intermediary", "official");
 
-            // SRG:
-            //   [OBF->SRG]
+            // SRG: [OBF->SRG]
             IMappingFile obf_to_srg = IMappingFile.load(tsrgFile);
 
-            // [INT->OBF] -chain-> [OBF->SRG] => [INT->SRG] =reverse=> [SRG->INT]
+            // Mapped: [SRG->INT]
+            //   [INT->OBF] --chain--> [OBF->SRG] => [INT->SRG]
+            //   [INT->SRG] -reverse->            => [SRG->INT]
             return MappingDetails.fromSrg(intermediary.chain(obf_to_srg).reverse());
         });
     }

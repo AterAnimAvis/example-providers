@@ -1,4 +1,4 @@
-package io.github.ateranimavis.forge_gradle.providers;
+package io.github.ateranimavis.forge_gradle.providers.fabric;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import net.minecraftforge.gradle.common.mapping.detail.Node;
 import net.minecraftforge.gradle.common.mapping.provider.CachingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.util.MavenArtifactDownloader;
-import net.minecraftforge.srgutils.IMappingFile;
 
 /**
  * Note: this causes compile exceptions in the mapped jar
@@ -27,7 +26,7 @@ public class YarnProvider extends CachingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("yarn");
+        return Collections.singleton("example_yarn");
     }
 
     @Override
@@ -46,30 +45,31 @@ public class YarnProvider extends CachingProvider {
             .add("codever", "1");
 
         return fromCachable(channel, version, cache, mappings, () -> {
-            IMappingFile yarn = ZipHelper.tinyFromZip(yarnZip, "intermediary", "named");
-
+            // Intermediary: [SRG->INT]
             IMappingDetail intermediary = intermediaryInfo.getDetails();
 
-            IMappingDetail overlay = MappingDetails.fromSrg(yarn);
+            // Yarn: [INT->MAP]
+            IMappingDetail yarn = MappingDetails.fromSrg(ZipHelper.tinyFromZip(yarnZip, "intermediary", "named"));
 
-            Map<String, IMappingDetail.INode> classNodes = chain(intermediary.getClasses(), overlay.getClasses());
-            Map<String, IMappingDetail.INode> fieldNodes = chain(intermediary.getFields(), overlay.getFields());
-            Map<String, IMappingDetail.INode> methodNodes = chain(intermediary.getMethods(), overlay.getMethods());
-            Map<String, IMappingDetail.INode> paramNodes = chain(intermediary.getParameters(), overlay.getParameters());
+            Map<String, IMappingDetail.INode> classNodes = chain(intermediary.getClasses(), yarn.getClasses());
+            Map<String, IMappingDetail.INode> fieldNodes = chain(intermediary.getFields(), yarn.getFields());
+            Map<String, IMappingDetail.INode> methodNodes = chain(intermediary.getMethods(), yarn.getMethods());
+            Map<String, IMappingDetail.INode> paramNodes = chain(intermediary.getParameters(), yarn.getParameters());
 
+            // Mapped: [SRG->MAP]
             return MappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
         });
     }
 
-    private static Map<String, IMappingDetail.INode> chain(Map<String, IMappingDetail.INode> original, Map<String, IMappingDetail.INode> overlay) {
-        Map<String, IMappingDetail.INode> nodes = new HashMap<>(original);
+    private static Map<String, IMappingDetail.INode> chain(Map<String, IMappingDetail.INode> srg_to_int, Map<String, IMappingDetail.INode> int_to_map) {
+        Map<String, IMappingDetail.INode> nodes = new HashMap<>(srg_to_int);
 
-        original.forEach((srg, s2i) -> {
+        srg_to_int.forEach((srg, s2i) -> {
             String intermediary = s2i.getMapped();
 
-            if (!overlay.containsKey(intermediary)) return;
+            if (!int_to_map.containsKey(intermediary)) return;
 
-            IMappingDetail.INode i2m = overlay.get(intermediary);
+            IMappingDetail.INode i2m = int_to_map.get(intermediary);
             nodes.compute(srg, (_srg, old) ->
                 Node.or(srg, old)
                     .withMapping(i2m.getMapped())

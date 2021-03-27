@@ -7,8 +7,9 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import io.github.ateranimavis.forge_gradle.providers.ExampleSrgFileProvider;
 import io.github.ateranimavis.forge_gradle.providers.FixedProvider;
-import io.github.ateranimavis.forge_gradle.providers.IntermediaryProvider;
-import io.github.ateranimavis.forge_gradle.providers.YarnProvider;
+import io.github.ateranimavis.forge_gradle.providers.fabric.IntermediaryProvider;
+import io.github.ateranimavis.forge_gradle.providers.fabric.YarnAltProvider;
+import io.github.ateranimavis.forge_gradle.providers.fabric.YarnProvider;
 import io.github.ateranimavis.forge_gradle.providers.overlay.MCPOverlaidProvider;
 import io.github.ateranimavis.forge_gradle.providers.overlay.OverlaidJavadocProvider;
 import io.github.ateranimavis.forge_gradle.providers.overlay.OverlaidOfficialProvider;
@@ -26,11 +27,12 @@ public class ExampleProvidersPlugin implements Plugin<Project> {
 
         MappingProviders.register("example:intermediary", new IntermediaryProvider());
         MappingProviders.register("example:yarn",         new YarnProvider());          //TODO: Causes compilation Exceptions in resulting Mapped Code
+        MappingProviders.register("example:yarn_alt",     new YarnAltProvider());       //TODO: Causes compilation Exceptions in resulting Mapped Code
         MappingProviders.register("example:overlaid",     new MCPOverlaidProvider());
         MappingProviders.register("example:fixed",        new FixedProvider());
         MappingProviders.register("example:srg",          new ExampleSrgFileProvider());
-        MappingProviders.register("example:overlaid_o",   new OverlaidOfficialProvider());
-        MappingProviders.register("example:overlaid_j",   new OverlaidJavadocProvider());
+        MappingProviders.register("example:official",     new OverlaidOfficialProvider());
+        MappingProviders.register("example:javadoc",      new OverlaidJavadocProvider());
 
         project.afterEvaluate(p -> {
             if (project.getRepositories().stream().noneMatch(it -> Objects.equals(it.getName(), FABRIC_MC_MAVEN))) {

@@ -16,7 +16,7 @@ public class FixedProvider implements IMappingProvider {
 
     @Override
     public Collection<String> getMappingChannels() {
-        return Collections.singleton("ex_fixed");
+        return Collections.singleton("example_fixed");
     }
 
     private static final Map<String, String> SOURCE_FOR_VERSION = new HashMap<>();
@@ -28,8 +28,6 @@ public class FixedProvider implements IMappingProvider {
 
     @Override
     public IMappingInfo getMappingInfo(Project project, String channel, String version) throws IOException {
-        project.getLogger().lifecycle("Resolving: " + this);
-
         if (!SOURCE_FOR_VERSION.containsKey(version)) {
             throw new IllegalArgumentException("Invalid mapping version: " + channel + "_" + version);
         }
