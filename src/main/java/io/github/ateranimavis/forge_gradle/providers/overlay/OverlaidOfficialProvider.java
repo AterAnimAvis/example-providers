@@ -74,7 +74,7 @@ public class OverlaidOfficialProvider implements IMappingProvider {
             .load(cacheMappings(project, channel, versionIn, "zip.input"))
             .add("official", official.get())
             .add("version", version)
-            .add("codever", "2");
+            .add("codever", "1");
 
         return fromCachable(channel, versionIn, cache, mappings, () -> {
             IMappingDetail detail = official.getDetails();
