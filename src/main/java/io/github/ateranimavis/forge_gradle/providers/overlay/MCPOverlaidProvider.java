@@ -2,26 +2,26 @@ package io.github.ateranimavis.forge_gradle.providers.overlay;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.gradle.api.Project;
-import net.minecraftforge.gradle.common.mapping.IMappingProvider;
-import net.minecraftforge.gradle.common.util.HashStore;
-import net.minecraftforge.gradle.common.mapping.IMappingDetail;
-import net.minecraftforge.gradle.common.mapping.IMappingInfo;
 import net.minecraftforge.gradle.common.mapping.MappingProviders;
-import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
-import net.minecraftforge.gradle.common.mapping.detail.Node;
+import net.minecraftforge.gradle.common.mapping.detail.IMappingDetail;
+import net.minecraftforge.gradle.common.mapping.info.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.provider.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.provider.OfficialMappingProvider;
+import net.minecraftforge.gradle.common.util.HashStore;
 
-import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.cacheMappings;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.commonHash;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.fromCacheable;
 
 public class MCPOverlaidProvider implements IMappingProvider {
     @Override
-    public Collection<String> getMappingChannels() {
+    public Set<String> getMappingChannels() {
         return Collections.singleton("example_official_mcp");
     }
 
@@ -43,7 +43,7 @@ public class MCPOverlaidProvider implements IMappingProvider {
             .add("version", version)
             .add("codever", "1");
 
-        return fromCachable(channel, version, cache, mappings, () -> {
+        return fromCacheable(channel, version, cache, mappings, () -> {
             IMappingDetail detail = official.getDetails();
             IMappingDetail overlay = mcp.getDetails();
 
@@ -52,7 +52,7 @@ public class MCPOverlaidProvider implements IMappingProvider {
             Map<String, IMappingDetail.INode> methodNodes = merge(overlay.getMethods(), detail.getMethods(), false);
             Map<String, IMappingDetail.INode> paramNodes = merge(overlay.getParameters(), detail.getParameters(), true);
 
-            return MappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
+            return IMappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
         });
     }
 
@@ -65,7 +65,7 @@ public class MCPOverlaidProvider implements IMappingProvider {
 
             IMappingDetail.INode node = overlay.get(srg);
             nodes.compute(srg, (_k1, old) ->
-                Node.or(srg, old)                   // Potentially create a new node, this should only occur if `fully`
+                IMappingDetail.INode.or(srg, old)                   // Potentially create a new node, this should only occur if `fully`
                     .withMapping(orig.getMapped())  // `orig` will either be from `overlay` if `fully` or `official` if not
                     .withJavadoc(node.getJavadoc()) // `node` will definitely be from `overlay`
             );
@@ -85,7 +85,7 @@ public class MCPOverlaidProvider implements IMappingProvider {
         if (parts.length == 2) {
             if (!parts[1].contains("-")) parts[1] = parts[1] + "-" + OfficialMappingProvider.getMinecraftVersion(parts[0]);
 
-            return new String[] { parts[0], "snapshot", parts[1] };
+            return new String[] {parts[0], "snapshot", parts[1]};
         }
 
         if (parts.length == 3) {

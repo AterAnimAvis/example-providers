@@ -2,19 +2,23 @@ package io.github.ateranimavis.forge_gradle.providers.fabric;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.gradle.api.Project;
 import io.github.ateranimavis.forge_gradle.providers.utils.ZipHelper;
-import net.minecraftforge.gradle.common.mapping.IMappingInfo;
-import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
+import net.minecraftforge.gradle.common.mapping.info.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.provider.IMappingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.util.MavenArtifactDownloader;
 import net.minecraftforge.srgutils.IMappingFile;
 
-import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.cacheMappings;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.commonHash;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.findRenames;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.fromCacheable;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.getMCPConfigZip;
 
 /**
  * Note: this causes compile exceptions in the mapped jar
@@ -22,7 +26,7 @@ import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
 public class YarnAltProvider implements IMappingProvider {
 
     @Override
-    public Collection<String> getMappingChannels() {
+    public Set<String> getMappingChannels() {
         return Collections.singleton("example_yarn_alt");
     }
 
@@ -50,7 +54,7 @@ public class YarnAltProvider implements IMappingProvider {
             .add("version", version)
             .add("codever", "1");
 
-        return fromCachable(channel, version, cache, mappings, () -> {
+        return fromCacheable(channel, version, cache, mappings, () -> {
             // Intermediary: [INT->OBF]
             IMappingFile intermediary = ZipHelper.tinyFromZip(intermediaryZip, "intermediary", "official");
 
@@ -77,5 +81,4 @@ public class YarnAltProvider implements IMappingProvider {
     public String toString() {
         return "Yarn Alt Provider";
     }
-
 }

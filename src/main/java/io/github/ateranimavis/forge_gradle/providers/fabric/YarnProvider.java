@@ -2,24 +2,24 @@ package io.github.ateranimavis.forge_gradle.providers.fabric;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.gradle.api.Project;
 import io.github.ateranimavis.forge_gradle.providers.utils.ZipHelper;
-import net.minecraftforge.gradle.common.mapping.IMappingDetail;
-import net.minecraftforge.gradle.common.mapping.IMappingInfo;
-import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.MappingProviders;
-import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
+import net.minecraftforge.gradle.common.mapping.detail.IMappingDetail;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
-import net.minecraftforge.gradle.common.mapping.detail.Node;
+import net.minecraftforge.gradle.common.mapping.info.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.provider.IMappingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
 import net.minecraftforge.gradle.common.util.MavenArtifactDownloader;
 
-import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.cacheMappings;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.commonHash;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.fromCacheable;
 
 /**
  * Note: this causes compile exceptions in the mapped jar
@@ -27,7 +27,7 @@ import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
 public class YarnProvider implements IMappingProvider {
 
     @Override
-    public Collection<String> getMappingChannels() {
+    public Set<String> getMappingChannels() {
         return Collections.singleton("example_yarn");
     }
 
@@ -46,7 +46,7 @@ public class YarnProvider implements IMappingProvider {
             .add("version", version)
             .add("codever", "1");
 
-        return fromCachable(channel, version, cache, mappings, () -> {
+        return fromCacheable(channel, version, cache, mappings, () -> {
             // Intermediary: [SRG->INT]
             IMappingDetail intermediary = intermediaryInfo.getDetails();
 
@@ -59,7 +59,7 @@ public class YarnProvider implements IMappingProvider {
             Map<String, IMappingDetail.INode> paramNodes = chain(intermediary.getParameters(), yarn.getParameters());
 
             // Mapped: [SRG->MAP]
-            return MappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
+            return IMappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
         });
     }
 
@@ -73,7 +73,7 @@ public class YarnProvider implements IMappingProvider {
 
             IMappingDetail.INode i2m = int_to_map.get(intermediary);
             nodes.compute(srg, (_srg, old) ->
-                Node.or(srg, old)
+                IMappingDetail.INode.or(srg, old)
                     .withMapping(i2m.getMapped())
                     .withJavadoc(i2m.getJavadoc())
             );

@@ -32,7 +32,7 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation 'net.minecraftforge.gradle:ForgeGradle:4.1.+'
+    implementation 'net.minecraftforge.gradle:ForgeGradle:4.1.7-local'
     implementation 'net.minecraftforge:srgutils:0.4.1'
     implementation 'de.siegmar:fastcsv:2.0.0'
 

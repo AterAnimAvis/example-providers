@@ -3,23 +3,25 @@ package io.github.ateranimavis.forge_gradle.providers;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.apache.tools.ant.util.ReaderInputStream;
 import org.gradle.api.Project;
-import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.detail.MappingDetails;
+import net.minecraftforge.gradle.common.mapping.info.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.provider.IMappingProvider;
 import net.minecraftforge.gradle.common.util.HashStore;
-import net.minecraftforge.gradle.common.mapping.IMappingInfo;
 import net.minecraftforge.srgutils.IMappingFile;
 
-import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.cacheMappings;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.commonHash;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.fromCacheable;
 
 public class ExampleSrgFileProvider implements IMappingProvider {
 
     @Override
-    public Collection<String> getMappingChannels() {
+    public Set<String> getMappingChannels() {
         return Collections.singleton("example_srg");
     }
 
@@ -38,14 +40,8 @@ public class ExampleSrgFileProvider implements IMappingProvider {
             .add("mappings", mappings)
             .add("codever", "1");
 
-        return fromCachable(channel, version, cache, destination, () ->
+        return fromCacheable(channel, version, cache, destination, () ->
             MappingDetails.fromSrg(IMappingFile.load(new ReaderInputStream(new StringReader(mappings))))
         );
     }
-
-    @Override
-    public String toString() {
-        return "Example IMappingFile";
-    }
-
 }

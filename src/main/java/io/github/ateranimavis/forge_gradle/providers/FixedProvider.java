@@ -1,21 +1,20 @@
 package io.github.ateranimavis.forge_gradle.providers;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.gradle.api.Project;
-import net.minecraftforge.gradle.common.mapping.IMappingInfo;
-import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.MappingProviders;
-import net.minecraftforge.gradle.common.mapping.info.MappingInfo;
+import net.minecraftforge.gradle.common.mapping.info.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.provider.IMappingProvider;
 
 public class FixedProvider implements IMappingProvider {
 
     @Override
-    public Collection<String> getMappingChannels() {
+    public Set<String> getMappingChannels() {
         return Collections.singleton("example_fixed");
     }
 
@@ -32,11 +31,6 @@ public class FixedProvider implements IMappingProvider {
             throw new IllegalArgumentException("Invalid mapping version: " + channel + "_" + version);
         }
 
-        return MappingInfo.of(channel, version, MappingProviders.getInfo(project, SOURCE_FOR_VERSION.get(version)).get());
-    }
-
-    @Override
-    public String toString() {
-        return "Example Fixed";
+        return IMappingInfo.of(channel, version, MappingProviders.getInfo(project, SOURCE_FOR_VERSION.get(version)).get());
     }
 }

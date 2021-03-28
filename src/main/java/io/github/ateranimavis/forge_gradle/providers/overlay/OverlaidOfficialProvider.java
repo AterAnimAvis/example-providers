@@ -2,24 +2,24 @@ package io.github.ateranimavis.forge_gradle.providers.overlay;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.gradle.api.Project;
 import de.siegmar.fastcsv.reader.NamedCsvReader;
 import de.siegmar.fastcsv.reader.NamedCsvRow;
-import net.minecraftforge.gradle.common.util.HashStore;
-import net.minecraftforge.gradle.common.mapping.IMappingDetail;
-import net.minecraftforge.gradle.common.mapping.IMappingInfo;
-import net.minecraftforge.gradle.common.mapping.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.MappingProviders;
-import net.minecraftforge.gradle.common.mapping.detail.MappingDetail;
-import net.minecraftforge.gradle.common.mapping.detail.Node;
+import net.minecraftforge.gradle.common.mapping.detail.IMappingDetail;
+import net.minecraftforge.gradle.common.mapping.info.IMappingInfo;
+import net.minecraftforge.gradle.common.mapping.provider.IMappingProvider;
 import net.minecraftforge.gradle.common.mapping.provider.OfficialMappingProvider;
+import net.minecraftforge.gradle.common.util.HashStore;
 
-import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.cacheMappings;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.commonHash;
+import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.fromCacheable;
 
 /**
  * An example {@link IMappingProvider} that produces mappings based on {@link OfficialMappingProvider} with overlaid information.
@@ -27,20 +27,16 @@ import static net.minecraftforge.gradle.common.mapping.util.CacheUtils.*;
 public class OverlaidOfficialProvider implements IMappingProvider {
 
     @Override
-    public Collection<String> getMappingChannels() {
+    public Set<String> getMappingChannels() {
         return Collections.singleton("example_official");
     }
 
     /**
      * <p>
-     * Supports Versions in the following formats: <br>
-     * [VERSION]-[JAVADOC-VERSION] <br>
-     *   => Javadocs [JAVADOC-VERSION] applied to (official, [VERSION]) <br>
+     * Supports Versions in the following formats: <br> [VERSION]-[JAVADOC-VERSION] <br> => Javadocs [JAVADOC-VERSION] applied to (official, [VERSION]) <br>
      * </p>
      * <p>
-     * Example: <br>
-     * 1.16.4-rev3 => Javadocs rev3 applied on-top of (official, 1.16.4) mappings<br>
-     * 1.16.4-20201209.230658-rev3 => Javadocs rev3 applied on-top of (official, 1.16.4-20201209.230658) mappings<br>
+     * Example: <br> 1.16.4-rev3 => Javadocs rev3 applied on-top of (official, 1.16.4) mappings<br> 1.16.4-20201209.230658-rev3 => Javadocs rev3 applied on-top of (official, 1.16.4-20201209.230658) mappings<br>
      * </p>
      */
     @Override
@@ -76,7 +72,7 @@ public class OverlaidOfficialProvider implements IMappingProvider {
             .add("version", version)
             .add("codever", "1");
 
-        return fromCachable(channel, versionIn, cache, mappings, () -> {
+        return fromCacheable(channel, versionIn, cache, mappings, () -> {
             IMappingDetail detail = official.getDetails();
 
             Map<String, IMappingDetail.INode> classNodes = apply(classes, detail.getClasses());
@@ -84,7 +80,7 @@ public class OverlaidOfficialProvider implements IMappingProvider {
             Map<String, IMappingDetail.INode> methodNodes = apply(methods, detail.getMethods());
             Map<String, IMappingDetail.INode> paramNodes = apply(params, detail.getParameters());
 
-            return MappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
+            return IMappingDetail.of(classNodes, fieldNodes, methodNodes, paramNodes);
         });
     }
 
@@ -109,13 +105,13 @@ public class OverlaidOfficialProvider implements IMappingProvider {
 
             for (NamedCsvRow row : csv) {
                 String mapped = row.getField("name");
-                String desc   = hasDesc ? row.getField("desc") : "";
+                String desc = hasDesc ? row.getField("desc") : "";
 
                 nodes.compute(row.getField("searge"), (srg, old) ->
                     mapped.isEmpty()
-                        ? Node.or(srg, old)
-                            .withJavadoc(desc)
-                        : Node.or(srg, old)
+                        ? IMappingDetail.INode.or(srg, old)
+                        .withJavadoc(desc)
+                        : IMappingDetail.INode.or(srg, old)
                             .withMapping(mapped)
                             .withJavadoc(desc)
                 );
