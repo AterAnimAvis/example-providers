@@ -20,19 +20,20 @@ public class ExampleProvidersPlugin implements Plugin<Project> {
 
     private static final String FABRIC_MC_MAVEN = "FabricMC Maven";
 
+    private static final String[] FORGE_PLUGINS = new String[] {
+        "net.minecraftforge.gradle",
+        "net.minecraftforge.gradle.patcher",
+
+        // Uncommon Aliases but still exist in FG4
+        "net.minecraftforge.gradle.forgedev",
+        "net.minecraftforge.gradle.forgedev.patcher"
+    };
+
     @Override
     public void apply(@Nonnull Project project) {
-        // Why have a name? It's used in debugging and makes it fairly to register new IMappingProviders without
-        //   worrying about how many times `apply` gets called.
-
-        MappingProviders.register("example:intermediary", new IntermediaryProvider());
-        MappingProviders.register("example:yarn",         new YarnProvider());          //TODO: Causes compilation Exceptions in resulting Mapped Code
-        MappingProviders.register("example:yarn_alt",     new YarnAltProvider());       //TODO: Causes compilation Exceptions in resulting Mapped Code
-        MappingProviders.register("example:overlaid",     new MCPOverlaidProvider());
-        MappingProviders.register("example:fixed",        new FixedProvider());
-        MappingProviders.register("example:srg",          new ExampleSrgFileProvider());
-        MappingProviders.register("example:official",     new OverlaidOfficialProvider());
-        MappingProviders.register("example:javadoc",      new OverlaidJavadocProvider());
+        // Why use PluginManager#withPlugin? It's so we're not dependent on the plugin apply order
+        for (String plugin : FORGE_PLUGINS)
+            project.getPluginManager().withPlugin(plugin, _plugin -> apply());
 
         project.afterEvaluate(p -> {
             if (project.getRepositories().stream().noneMatch(it -> Objects.equals(it.getName(), FABRIC_MC_MAVEN))) {
@@ -48,6 +49,20 @@ public class ExampleProvidersPlugin implements Plugin<Project> {
                 });
             }
         });
+    }
+
+    private void apply() {
+        // Why have a name? It's used in debugging and makes it fairly to register new IMappingProviders without
+        //   worrying about how many times `apply` gets called.
+
+        MappingProviders.register("example:intermediary", new IntermediaryProvider());
+        MappingProviders.register("example:yarn",         new YarnProvider());          //TODO: Causes compilation Exceptions in resulting Mapped Code
+        MappingProviders.register("example:yarn_alt",     new YarnAltProvider());       //TODO: Causes compilation Exceptions in resulting Mapped Code
+        MappingProviders.register("example:overlaid",     new MCPOverlaidProvider());
+        MappingProviders.register("example:fixed",        new FixedProvider());
+        MappingProviders.register("example:srg",          new ExampleSrgFileProvider());
+        MappingProviders.register("example:official",     new OverlaidOfficialProvider());
+        MappingProviders.register("example:javadoc",      new OverlaidJavadocProvider());
     }
 
 }
